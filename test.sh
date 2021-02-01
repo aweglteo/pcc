@@ -16,6 +16,14 @@ assert() {
     fi 
 }
 
+assert 0 '0==1'
+assert 1 '5==5'
+assert 1 '10>=5'
+assert 0 '8>=10'
+assert 1 '1>0'
+assert 1 '9<19'
+assert 1 '6>-1'
+
 assert 1 '2-1'
 assert 47 '5+6*7'
 assert 8 '5+3'
