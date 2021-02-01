@@ -23,5 +23,6 @@ assert 5 '(2+4)-1'
 assert 13 '6+(6+1)'
 assert 60 '30+40-10'
 assert 12 '(2+1)*(3+1)'
+assert 43 '-7+50/1'
 
 echo "OK"
