@@ -7,7 +7,6 @@ pcc: $(OBJS)
 
 $(OBJS): pcc.h
 
-
 test: pcc
 	./test.sh
 

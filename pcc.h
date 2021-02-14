@@ -69,3 +69,8 @@ Node *unary();
 // code gen
 void gen(Node *node);
 
+
+
+// global
+char *user_input;
+Token *token;
