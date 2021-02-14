@@ -8,9 +8,10 @@
 
 // tokenizer
 typedef enum {
-  TK_RESERVED,
-  TK_NUM,
-  TK_EOF,
+  TK_RESERVED, // for grammertical signature
+  TK_IDENT, // for local variables
+  TK_NUM, // for number
+  TK_EOF, // eof signature
 } TokenKind;
 
 typedef struct Token Token;
@@ -67,8 +68,7 @@ Node *primary();
 Node *unary();
 
 // code gen
-void gen(Node *node);
-
+void generator(Node *node);
 
 
 // global
