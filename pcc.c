@@ -1,15 +1,5 @@
 #include "pcc.h"
 
-typedef struct Token Token;
-
-struct Token {
-  TokenKind kind;
-  Token *next;
-  int val;
-  char *str;
-  int len;
-};
-
 char *user_input;
 Token *token;
 
@@ -115,27 +105,6 @@ Token *tokenize() {
 }
 
 
-// parser
-typedef enum {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_NUM, // Integer
-  ND_EQ, // ==
-  ND_NE, // !=
-  ND_LT, // <
-  ND_LE, // <=
-} NodeKind;
-
-typedef struct Node Node;
-struct Node {
-  NodeKind kind;
-  Node *lhs;   // lef,t hand side
-  Node *rhs;   // right hand side
-  int val;
-};
-
 Node *new_node(NodeKind kind) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -154,14 +123,6 @@ Node *new_num(int val) {
   node->val = val;
   return node;
 }
-
-Node *expr();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *primary();
-Node *unary();
 
 Node *expr() {
   return equality();
@@ -239,6 +200,8 @@ Node *unary() {
   return primary();
 }
 
+
+// codegen
 void gen(Node *node) {
   if (node->kind == ND_NUM) {
     printf("  push %d\n", node->val);
