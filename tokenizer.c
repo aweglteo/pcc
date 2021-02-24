@@ -95,6 +95,12 @@ Token *tokenize() {
       cur->len = p - q;
       continue;
     }
+
+    if ('a' <= *p && *p <= 'z') {
+      cur = new_token(TK_IDENT, cur, p++, 1);
+      continue;
+    }
+    
     error_at(token->str, "Error: cannot tokenize");
   }
   new_token(TK_EOF, cur, p, 0);
