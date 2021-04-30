@@ -69,14 +69,24 @@ Token *tokenize(char *p) {
   head.next = NULL;
   Token *cur = &head;
 
-
   while (*p) {
 
+    // if exists one-line comments
     if (startswith(p, "//")) {
       p += 2;
       while (*p != '\n') {
         p++;
       }
+      continue;
+    }
+
+    // if exists block comments
+    if (startswith(p, "/*")) {
+      char *q = strstr(p+2, "*/");
+      if (!q) {
+        error_at(p+2, "unclosed blocked comment");
+      }
+      p = q + 2;
       continue;
     }
 
