@@ -70,7 +70,17 @@ Token *tokenize() {
   head.next = NULL;
   Token *cur = &head;
 
+
   while (*p) {
+
+    if (startswith(p, "//")) {
+      p += 2;
+      while (*p != '\n') {
+        p++;
+      }
+      continue;
+    }
+
     if (isspace(*p)) {
       p++;
       continue;
