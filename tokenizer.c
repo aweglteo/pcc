@@ -64,8 +64,7 @@ bool startswith(char *p, char *q) {
 }
 
 // arg is input
-Token *tokenize() {
-  char *p = user_input;
+Token *tokenize(char *p) {
   Token head;
   head.next = NULL;
   Token *cur = &head;
