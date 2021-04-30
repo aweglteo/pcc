@@ -8,6 +8,7 @@
 
 // tokenizer
 typedef enum {
+  TK_PUNCT, // for punctuators
   TK_RESERVED, // for grammertical signature
   TK_IDENT, // for local variables
   TK_NUM, // for number
@@ -21,7 +22,8 @@ struct Token {
   Token *next;
   int val;
   char *str;
-  int len;
+  int len; // token length
+  char *loc; // token location
 };
 
 void error(char *fmt, ...);
@@ -30,7 +32,7 @@ bool consume(char *op);
 void expect(char *op);
 int expect_number();
 bool at_eof();
-Token *new_token(TokenKind kind, Token *cur, char *str, int len);
+Token *new_token(TokenKind kind, Token *cur, char *str, char *start, char *end);
 bool startswith(char *p, char *q);
 Token *tokenize();
 
