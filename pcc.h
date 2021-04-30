@@ -32,7 +32,7 @@ bool consume(char *op);
 void expect(char *op);
 int expect_number();
 bool at_eof();
-Token *new_token(TokenKind kind, Token *cur, char *str, char *start, char *end);
+Token *new_token(TokenKind kind, char *str, char *start, char *end);
 bool startswith(char *p, char *q);
 Token *tokenize();
 

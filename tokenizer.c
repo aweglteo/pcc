@@ -50,11 +50,10 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-Token *new_token(TokenKind kind, Token *cur, char *str, char *start, char *end) {
+Token *new_token(TokenKind kind, char *str, char *start, char *end) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
   tok->str = str;
-  cur->next = tok;
   tok->len = end - start;
   return tok;
 }
@@ -65,7 +64,7 @@ bool startswith(char *p, char *q) {
 
 // arg is input
 Token *tokenize(char *p) {
-  Token head;
+  Token head = {};
   head.next = NULL;
   Token *cur = &head;
 
@@ -107,19 +106,26 @@ Token *tokenize(char *p) {
     // punctuator
     if (startswith(p, "==") || startswith(p, "!=") ||
         startswith(p, "<=") || startswith(p, ">=")) {
-      cur = new_token(TK_RESERVED, cur, p, p, p+2);
+
+      cur->next = new_token(TK_RESERVED, p, p, p+2);
+      cur = cur->next;
+
       p += 2;
       continue;
     }
 
     if (strchr("+-*/()<>", *p)) {
       // p++ return the val of *p
-      cur = new_token(TK_RESERVED, cur, p++, p, p+1);
+      cur->next = new_token(TK_RESERVED, p++, p, p+1);
+      cur = cur->next;
+
       continue;
     }
 
     if (isdigit(*p)) {
-      cur = new_token(TK_NUM, cur, p, p, p);
+      cur->next = new_token(TK_NUM, p, p, p);
+      cur = cur->next;
+
       char *q = p;
       cur->val = strtol(p, &p, 10);
       cur->len = p - q;
@@ -127,12 +133,17 @@ Token *tokenize(char *p) {
     }
 
     if ('a' <= *p && *p <= 'z') {
-      cur = new_token(TK_IDENT, cur, p++, p, p+1);
+      cur->next = new_token(TK_IDENT, p++, p, p+1);
+      cur = cur->next;
+
       continue;
     }
     
     error_at(token->str, "Error: cannot tokenize");
   }
-  new_token(TK_EOF, cur, p, p, p);
+
+  cur->next = new_token(TK_EOF, p, p, p);
+  cur = cur->next;
+  
   return head.next;
 }
