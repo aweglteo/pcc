@@ -90,10 +90,20 @@ Token *tokenize(char *p) {
       continue;
     }
 
+    // skip new line
+    if (startswith(p, '\n')) {
+      p += 1;
+      continue;
+    }
+
+    // skip whitespace
     if (isspace(*p)) {
       p++;
       continue;
     }
+
+    // body of tokenizer
+    
     // punctuator
     if (startswith(p, "==") || startswith(p, "!=") ||
         startswith(p, "<=") || startswith(p, ">=")) {
