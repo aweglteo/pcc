@@ -42,6 +42,8 @@ typedef enum {
   ND_MUL, // *
   ND_DIV, // /
   ND_NUM, // Integer
+  ND_ASSIGN, // =
+  ND_LVAR, // local variable
   ND_EQ, // ==
   ND_NE, // !=
   ND_LT, // <
@@ -53,7 +55,8 @@ struct Node {
   NodeKind kind;
   Node *lhs;   // lef,t hand side
   Node *rhs;   // right hand side
-  int val;
+  int val;     // Node val
+  int offset;  // stack offset for local variable
 };
 
 Node *new_node(NodeKind kind);
