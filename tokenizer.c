@@ -64,8 +64,7 @@ bool startswith(char *p, char *q) {
 }
 
 // arg is input
-Token *tokenize() {
-  char *p = user_input;
+Token *tokenize(char *p) {
   Token head;
   head.next = NULL;
   Token *cur = &head;
@@ -105,6 +104,12 @@ Token *tokenize() {
       cur->len = p - q;
       continue;
     }
+
+    if ('a' <= *p && *p <= 'z') {
+      cur = new_token(TK_IDENT, cur, p++, 1);
+      continue;
+    }
+    
     error_at(token->str, "Error: cannot tokenize");
   }
   new_token(TK_EOF, cur, p, 0);
