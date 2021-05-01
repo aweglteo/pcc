@@ -26,8 +26,10 @@ struct Token {
   char *loc; // token location
 };
 
+void verror_at(char *loc, char *fmt, va_list ap);
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
+
 bool consume(char *op);
 void expect(char *op);
 int expect_number();
@@ -43,6 +45,7 @@ typedef enum {
   ND_SUB, // -
   ND_MUL, // *
   ND_DIV, // /
+  ND_NEG, // unary -
   ND_NUM, // Integer
   ND_ASSIGN, // =
   ND_LVAR, // local variable
@@ -57,6 +60,7 @@ struct Node {
   NodeKind kind;
   Node *lhs;   // lef,t hand side
   Node *rhs;   // right hand side
+  char name;   // if kind == ND_LVAR 
   int val;     // Node val
   int offset;  // stack offset for local variable
 };
@@ -64,18 +68,18 @@ struct Node {
 Node *new_node(NodeKind kind);
 Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_num(int val);
-Node *expr();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *primary();
-Node *unary();
+Node *expr(Token **rest, Token *tok);
+Node *equality(Token **rest, Token *tok);
+Node *relational(Token **rest, Token *tok);
+Node *add(Token **rest, Token *tok);
+Node *mul(Token **rest, Token *tok);
+Node *unary(Token **rest, Token *tok);
+Node *primary(Token **rest, Token *tok);
 
 // code gen
 void generator(Node *node);
 
 
 // global
-char *user_input;
+char *current_input;
 Token *token;

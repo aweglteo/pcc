@@ -1,6 +1,17 @@
 #include "pcc.h"
 
-// 
+static int depth;
+
+static void push(void) {
+  printf("  push %%rax\n");
+  depth++;
+}
+
+static void pop(char *arg) {
+  printf("  pop %s\n", arg);
+  depth--;
+}
+
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR)
     error("error not local variable for left value");
@@ -15,6 +26,10 @@ void gen(Node *node) {
   switch(node->kind) {
   case ND_NUM:
     printf("  push %d\n", node->val);
+    return;
+  case ND_NEG:
+    gen(node->lhs);
+    printf("  neg %%rax\n");
     return;
   case ND_LVAR:
     gen_lval(node);
