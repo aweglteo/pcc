@@ -16,16 +16,16 @@ void gen_lval(Node *node) {
   if (node->kind != ND_LVAR)
     error("error not local variable for left value");
 
-  printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", node->offset);
-  printf("  push rax\n");
+  printf("  mov %%rax, %%rbp\n");
+  printf("  sub %%rax, %d\n", node->offset);
+  printf("  push %%rax\n");
 }
 
 // codegen
 void gen_expr(Node *node) {
   switch(node->kind) {
   case ND_NUM:
-    printf("  push %d\n", node->val);
+    printf("  mov $%d, %%rax\n", node->val);
     return;
   case ND_NEG:
     gen_expr(node->lhs);
@@ -47,59 +47,52 @@ void gen_expr(Node *node) {
     return;
   }
 
-  gen_expr(node->lhs);
   gen_expr(node->rhs);
-
-  printf("  pop rdi\n");
-  printf("  pop rax\n");
+  push();
+  gen_expr(node->lhs);
+  pop("%rdi");
 
   switch (node->kind) {
   case ND_ADD:
-    printf("  add rax, rdi\n");
-    break;
+    printf("  add %%rdi, %%rax\n");
+    return;
   case ND_SUB:
-    printf("  sub rax, rdi\n");
-    break;
+    printf("  sub %%rdi, %%rax\n");
+    return;
   case ND_MUL:
-    printf("  imul rax, rdi\n");
-    break;
+    printf("  imul %%rdi, %%rax\n");
+    return;
   case ND_DIV:
     printf("  cqo\n");
-    printf("  idiv rdi\n");
-    break;
+    printf("  idiv %%rdi\n");
+    return;
   case ND_EQ:
-    printf("  cmp rax, rdi\n");
-    printf("  sete al\n");
-    printf("  movzb rax, al\n");
-    break;
   case ND_NE:
-    printf("  cmp rax, rdi\n");
-    printf("  setne al\n");
-    printf("  movzb rax, al\n");
-    break;
   case ND_LT:
-    printf("  cmp rax, rdi\n");
-    printf("  setl al\n");
-    printf("  movzb rax, al\n");
-    break;
   case ND_LE:
-    printf("  cmp rax, rdi\n");
-    printf("  setle al\n");
-    printf("  movzb rax, al\n");
-    break;
+    printf("  cmp %%rdi, %%rax\n");
+
+    if (node->kind == ND_EQ)
+      printf("  sete %%al\n");
+    else if (node->kind == ND_NE)
+      printf("  setne %%al\n");
+    else if (node->kind == ND_LT)
+      printf("  setl %%al\n");
+    else if (node->kind == ND_LE)
+      printf("  setle %%al\n");
+
+    printf("  movzb %%al, %%rax\n");
+    return;
   }
-  push();
 }
 
 
 void generator(Node *node) {
     // import header
-	printf(".intel_syntax noprefix\n");
-	printf(".global main\n");
+	printf("  .global main\n");
 	printf("main:\n");
 
   gen_expr(node);
 
-  printf("  pop rax\n");
 	printf("  ret\n");
 }
