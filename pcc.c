@@ -7,8 +7,10 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-  token = tokenize(argv[1]);
-  Node *node = expr();
+	current_input = argv[1];
+
+  Token *tok = tokenize(argv[1]);
+  Node *node = expr(&tok, tok);
 
   generator(node);
   

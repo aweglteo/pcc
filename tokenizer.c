@@ -13,8 +13,8 @@ void error_at(char *loc, char *fmt, ...) {
   va_start(ap, fmt);
 
   // the num of byte of already read
-  int pos = loc - user_input;
-  fprintf(stderr, "%s\n", user_input);
+  int pos = loc - current_input;
+  fprintf(stderr, "%s\n", current_input);
   fprintf(stderr, "%*s", pos, " ");
   fprintf(stderr, "^ ");
   vfprintf(stderr, fmt, ap);
@@ -54,6 +54,7 @@ Token *new_token(TokenKind kind, char *str, char *start, char *end) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
   tok->str = str;
+  tok->loc = start;
   tok->len = end - start;
   return tok;
 }
@@ -144,6 +145,6 @@ Token *tokenize(char *p) {
 
   cur->next = new_token(TK_EOF, p, p, p);
   cur = cur->next;
-  
+
   return head.next;
 }
