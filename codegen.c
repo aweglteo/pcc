@@ -22,13 +22,13 @@ void gen_lval(Node *node) {
 }
 
 // codegen
-void gen(Node *node) {
+void gen_expr(Node *node) {
   switch(node->kind) {
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
   case ND_NEG:
-    gen(node->lhs);
+    gen_expr(node->lhs);
     printf("  neg %%rax\n");
     return;
   case ND_LVAR:
@@ -39,7 +39,7 @@ void gen(Node *node) {
     return;
   case ND_ASSIGN:
     gen_lval(node->lhs);
-    gen(node->rhs);
+    gen_expr(node->rhs);
     printf("  pop rdi\n");
     printf("  pop rax\n");
     printf("  mov [rax], rdi\n");
@@ -47,8 +47,8 @@ void gen(Node *node) {
     return;
   }
 
-  gen(node->lhs);
-  gen(node->rhs);
+  gen_expr(node->lhs);
+  gen_expr(node->rhs);
 
   printf("  pop rdi\n");
   printf("  pop rax\n");
@@ -88,7 +88,7 @@ void gen(Node *node) {
     printf("  movzb rax, al\n");
     break;
   }
-  printf("  push rax\n");
+  push();
 }
 
 
@@ -98,7 +98,7 @@ void generator(Node *node) {
 	printf(".global main\n");
 	printf("main:\n");
 
-  gen(node);
+  gen_expr(node);
 
   printf("  pop rax\n");
 	printf("  ret\n");
