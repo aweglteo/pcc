@@ -30,7 +30,6 @@ void verror_at(char *loc, char *fmt, va_list ap);
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 
-bool consume(char *op);
 void expect(char *op);
 int expect_number();
 bool at_eof();

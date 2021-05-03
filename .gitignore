@@ -3,3 +3,5 @@
 tmp*
 a.out
 pcc
+
+.gdb_history

@@ -22,14 +22,6 @@ void error_at(char *loc, char *fmt, ...) {
   exit(1);
 }
 
-bool consume(char *op) {
-  if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len)) {
-    return false;
-  }
-  token = token->next;
-  return true;
-}
-
 void expect(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
