@@ -44,6 +44,20 @@ Token *skip(Token *tok, char *s) {
 }
 
 // eBNF
+
+// stmt := expr_stmt
+Node *stmt(Token **rest, Token *tok) {
+  return expr_stmt(rest, tok);
+}
+
+// expr_stmt := expr ";"
+Node *expr_stmt(Token **rest, Token *tok) {
+  Node *node = new_unary(ND_EXPR_STMT, expr(&tok, tok));
+  *rest = skip(tok, ";");
+  return node;
+}
+
+
 // expr := equality
 Node *expr(Token **rest, Token *tok) {
   return equality(rest, tok);
@@ -166,4 +180,11 @@ Node *primary(Token **rest, Token *tok) {
   }
 }
 
-
+Node *parse(Token *tok) {
+  Node head = {};
+  Node *cur = &head;
+  while (tok->kind != TK_EOF) {
+    cur = cur->next = stmt(&tok, tok);
+  }
+  return head.next;
+}

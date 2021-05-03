@@ -21,6 +21,14 @@ void gen_lval(Node *node) {
   printf("  push %%rax\n");
 }
 
+void gen_stmt(Node *node) {
+  if (node->kind == ND_EXPR_STMT) {
+    gen_expr(node->lhs);
+    return;
+  }
+  error("invalid statement");
+}
+
 // codegen
 void gen_expr(Node *node) {
   switch(node->kind) {
@@ -92,7 +100,10 @@ void generator(Node *node) {
 	printf("  .global main\n");
 	printf("main:\n");
 
-  gen_expr(node);
+  for (Node *n = node; n; n=n->next) {
+    gen_stmt(n);
+    assert(depth == 0);
+  }
 
 	printf("  ret\n");
 }

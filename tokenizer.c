@@ -55,6 +55,13 @@ bool startswith(char *p, char *q) {
   return memcmp(p, q, strlen(q)) == 0;
 }
 
+int read_punct(char *p) {
+  if (startswith(p, "==") || startswith(p, "!=") || startswith(p, "<=") || startswith(p, ">=")) {
+    return 2;
+  }
+  return ispunct(*p) ? 1 : 0;
+}
+
 // arg is input
 Token *tokenize(char *p) {
   Token head = {};
@@ -94,27 +101,6 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    // body of tokenizer
-
-    // punctuator
-    if (startswith(p, "==") || startswith(p, "!=") ||
-        startswith(p, "<=") || startswith(p, ">=")) {
-
-      cur->next = new_token(TK_RESERVED, p, p, p+2);
-      cur = cur->next;
-
-      p += 2;
-      continue;
-    }
-
-    if (strchr("+-*/()<>", *p)) {
-      // p++ return the val of *p
-      cur->next = new_token(TK_RESERVED, p++, p, p+1);
-      cur = cur->next;
-
-      continue;
-    }
-
     if (isdigit(*p)) {
       cur->next = new_token(TK_NUM, p, p, p);
       cur = cur->next;
@@ -125,12 +111,13 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    if ('a' <= *p && *p <= 'z') {
-      cur->next = new_token(TK_IDENT, p++, p, p+1);
-      cur = cur->next;
-
+    int punct_len = read_punct(p);
+    if (punct_len) {
+      cur = cur->next = new_token(TK_PUNCT, p, p, p+punct_len);
+      p += cur->len;
       continue;
     }
+
     
     error_at(token->str, "Error: cannot tokenize");
   }

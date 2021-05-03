@@ -4,6 +4,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<assert.h>
 
 
 // tokenizer
@@ -52,6 +53,7 @@ typedef enum {
   ND_NE, // !=
   ND_LT, // <
   ND_LE, // <=
+  ND_EXPR_STMT, // statement
 } NodeKind;
 
 typedef struct Node Node;
@@ -59,15 +61,21 @@ struct Node {
   NodeKind kind;
   Node *lhs;   // lef,t hand side
   Node *rhs;   // right hand side
-  char name;   // if kind == ND_LVAR 
+  Node *next;
+  char name;   // if kind == ND_LVAR
   int val;     // Node val
   int offset;  // stack offset for local variable
 };
 
+Node *parse(Token *tok);
 Node *new_node(NodeKind kind);
 Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_num(int val);
+
+
+// BNF component
 Node *expr(Token **rest, Token *tok);
+Node *expr_stmt(Token **rest, Token *tok);
 Node *equality(Token **rest, Token *tok);
 Node *relational(Token **rest, Token *tok);
 Node *add(Token **rest, Token *tok);
@@ -77,6 +85,7 @@ Node *primary(Token **rest, Token *tok);
 
 // code gen
 void generator(Node *node);
+void gen_expr(Node *node);
 
 
 // global
