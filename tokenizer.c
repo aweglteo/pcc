@@ -30,10 +30,9 @@ void expect(char *op) {
   token = token->next;
 }
 
-Token *new_token(TokenKind kind, char *str, char *start, char *end) {
+Token *new_token(TokenKind kind, char *start, char *end) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
-  tok->str = str;
   tok->loc = start;
   tok->len = end - start;
   return tok;
@@ -41,6 +40,14 @@ Token *new_token(TokenKind kind, char *str, char *start, char *end) {
 
 bool startswith(char *p, char *q) {
   return memcmp(p, q, strlen(q)) == 0;
+}
+
+bool is_ident1(char c) {
+  return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
+}
+
+bool is_ident2(char c) {
+  return is_ident1(c) || ('0' <= c && c <= '9');
 }
 
 int read_punct(char *p) {
@@ -90,7 +97,7 @@ Token *tokenize(char *p) {
     }
 
     if (isdigit(*p)) {
-      cur->next = new_token(TK_NUM, p, p, p);
+      cur->next = new_token(TK_NUM, p, p);
       cur = cur->next;
 
       char *q = p;
@@ -100,16 +107,19 @@ Token *tokenize(char *p) {
     }
 
     // Identifier
-    if ('a' <= *p && *p <= 'z') {
-      cur = cur->next = new_token(TK_IDENT, p, p, p+1);
-      p++;
+    if (is_ident1(*p)) {
+      char *start = p;
+      do {
+        p++;
+      } while (is_ident2(*p));
+      cur = cur->next = new_token(TK_IDENT, start, p);
       continue;
     }
 
     // Punctuators
     int punct_len = read_punct(p);
     if (punct_len) {
-      cur = cur->next = new_token(TK_PUNCT, p, p, p+punct_len);
+      cur = cur->next = new_token(TK_PUNCT, p, p+punct_len);
       p += cur->len;
       continue;
     }
@@ -118,7 +128,7 @@ Token *tokenize(char *p) {
     error_at(token->str, "Error: cannot tokenize");
   }
 
-  cur->next = new_token(TK_EOF, p, p, p);
+  cur->next = new_token(TK_EOF, p, p);
   cur = cur->next;
 
   return head.next;

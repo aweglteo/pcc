@@ -40,5 +40,7 @@ assert 3 'a=3; a;'
 assert 8 'a=3; z=5; a+z;'
 assert 6 'a=b=3; a+b;'
 assert 10 'a=12; b=2; c=a-b; c;'
+assert 1 'hoge=1; hoge;'
+assert 15 'hoge=10; fuga=5; hoge+fuga;'
 
 echo "OK"

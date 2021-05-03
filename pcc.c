@@ -10,9 +10,9 @@ int main(int argc, char **argv) {
 	current_input = argv[1];
 
   Token *tok = tokenize(argv[1]);
-  Node *node = parse(tok);
+  Function *prog = parse(tok);
 
-  generator(node);
+  generator(prog);
   
 	return 0;
 }

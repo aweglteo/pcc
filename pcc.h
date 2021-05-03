@@ -36,6 +36,23 @@ void error_at(char *loc, char *fmt, ...);
 Token *tokenize();
 
 // parser
+
+// Local variable
+typedef struct Obj Obj;
+struct Obj {
+  Obj *next;
+  char *name;
+  int offset; // Offset from rbp
+};
+
+// function stack
+typedef struct Function Function;
+struct Function {
+  Node *body;
+  Obj *locals;
+  int stack_size;
+};
+
 typedef enum {
   ND_ADD, // +
   ND_SUB, // -
@@ -52,22 +69,17 @@ typedef enum {
   ND_EXPR_STMT, // statement
 } NodeKind;
 
-typedef struct Node Node;
 struct Node {
   NodeKind kind;
   Node *lhs;   // lef,t hand side
   Node *rhs;   // right hand side
   Node *next;
-  char name;   // if kind == ND_VAR
+  Obj *var;   // if kind == ND_VAR
   int val;     // Node val
   int offset;  // stack offset for local variable
 };
 
-Node *parse(Token *tok);
-Node *new_node(NodeKind kind);
-Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
-Node *new_num(int val);
-
+Function *parse(Token *tok);
 
 // BNF component
 Node *expr(Token **rest, Token *tok);
@@ -81,7 +93,7 @@ Node *unary(Token **rest, Token *tok);
 Node *primary(Token **rest, Token *tok);
 
 // code gen
-void generator(Node *node);
+void generator(Function *prog);
 void gen_expr(Node *node);
 
 
