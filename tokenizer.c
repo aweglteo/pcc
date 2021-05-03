@@ -30,18 +30,6 @@ void expect(char *op) {
   token = token->next;
 }
 
-int expect_number() {
-  if (token->kind != TK_NUM)
-    error_at(token->str, "Error: cannot tokenize");
-  int val = token->val;
-  token = token->next;
-  return val;
-}
-
-bool at_eof() {
-  return token->kind == TK_EOF;
-}
-
 Token *new_token(TokenKind kind, char *str, char *start, char *end) {
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;

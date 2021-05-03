@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include<ctype.h>
 #include<stdarg.h>
 #include<stdbool.h>
@@ -6,6 +7,7 @@
 #include<string.h>
 #include<assert.h>
 
+typedef struct Node Node;
 
 // tokenizer
 typedef enum {
@@ -31,14 +33,8 @@ void verror_at(char *loc, char *fmt, va_list ap);
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 
-void expect(char *op);
-int expect_number();
-bool at_eof();
-Token *new_token(TokenKind kind, char *str, char *start, char *end);
-bool startswith(char *p, char *q);
 Token *tokenize();
 
-// parser
 // parser
 typedef enum {
   ND_ADD, // +
