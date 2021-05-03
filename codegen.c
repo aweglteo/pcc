@@ -12,13 +12,13 @@ static void pop(char *arg) {
   depth--;
 }
 
-void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR)
-    error("error not local variable for left value");
-
-  printf("  mov %%rax, %%rbp\n");
-  printf("  sub %%rax, %d\n", node->offset);
-  printf("  push %%rax\n");
+void gen_addr(Node *node) {
+  if (node->kind == ND_VAR) {
+    int offset = (node->name - 'a' + 1) * 8;
+    printf("  lea %d(%%rbp), %%rax\n", -offset);
+    return;
+  }
+  error("not an lvalue");
 }
 
 void gen_stmt(Node *node) {
@@ -39,19 +39,16 @@ void gen_expr(Node *node) {
     gen_expr(node->lhs);
     printf("  neg %%rax\n");
     return;
-  case ND_LVAR:
-    gen_lval(node);
-    printf("  pop rax\n");
-    printf("  mov rax, [rax]\n");
-    printf("  push rax\n");
+  case ND_VAR:
+    gen_addr(node);
+    printf("  mov (%%rax), %%rax\n");
     return;
   case ND_ASSIGN:
-    gen_lval(node->lhs);
+    gen_addr(node->lhs);
+    push();
     gen_expr(node->rhs);
-    printf("  pop rdi\n");
-    printf("  pop rax\n");
-    printf("  mov [rax], rdi\n");
-    printf("  push rdi\n");
+    pop("%rdi");
+    printf("  mov %%rax, (%%rdi)\n");
     return;
   }
 
@@ -100,10 +97,17 @@ void generator(Node *node) {
 	printf("  .global main\n");
 	printf("main:\n");
 
+  // Prologue
+  printf("  push %%rbp\n");
+  printf("  mov %%rsp, %%rbp\n");
+  printf("  sub $208, %%rsp\n");
+
   for (Node *n = node; n; n=n->next) {
     gen_stmt(n);
     assert(depth == 0);
   }
-
+  
+  printf("  mov %%rbp, %%rsp\n");
+  printf("  pop %%rbp\n");
 	printf("  ret\n");
 }

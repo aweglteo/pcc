@@ -48,7 +48,7 @@ typedef enum {
   ND_NEG, // unary -
   ND_NUM, // Integer
   ND_ASSIGN, // =
-  ND_LVAR, // local variable
+  ND_VAR, // local variable
   ND_EQ, // ==
   ND_NE, // !=
   ND_LT, // <
@@ -62,7 +62,7 @@ struct Node {
   Node *lhs;   // lef,t hand side
   Node *rhs;   // right hand side
   Node *next;
-  char name;   // if kind == ND_LVAR
+  char name;   // if kind == ND_VAR
   int val;     // Node val
   int offset;  // stack offset for local variable
 };
@@ -76,6 +76,7 @@ Node *new_num(int val);
 // BNF component
 Node *expr(Token **rest, Token *tok);
 Node *expr_stmt(Token **rest, Token *tok);
+Node *assign(Token **rest, Token *tok);
 Node *equality(Token **rest, Token *tok);
 Node *relational(Token **rest, Token *tok);
 Node *add(Token **rest, Token *tok);

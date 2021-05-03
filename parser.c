@@ -31,6 +31,13 @@ Node *new_num(int val) {
   return node;
 }
 
+// for local variable
+Node *new_var_node(char name) {
+  Node *node = new_node(ND_VAR);
+  node->name = name;
+  return node;
+}
+
 // consume token if matches op
 bool equal(Token *tok, char *op) {
   return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
@@ -42,6 +49,7 @@ Token *skip(Token *tok, char *s) {
     error_tok(tok, "expected '%s'", s);
   return tok->next;
 }
+
 
 // eBNF
 
@@ -58,9 +66,19 @@ Node *expr_stmt(Token **rest, Token *tok) {
 }
 
 
-// expr := equality
+// expr := assign
 Node *expr(Token **rest, Token *tok) {
-  return equality(rest, tok);
+  return assign(rest, tok);
+}
+
+// assign := equality ("=" assign)?
+Node *assign(Token **rest, Token *tok) {
+  Node *node = equality(&tok, tok);
+  if (equal(tok, "=")) {
+    node = new_binary(ND_ASSIGN, node, assign(&tok, tok->next));
+  }
+  *rest = tok;
+  return node;
 }
 
 // equality := relational ( "==" relational | "!=" relational)*
@@ -165,11 +183,17 @@ Node *unary(Token **rest, Token *tok) {
   return primary(rest, tok);
 }
 
-// primary := "(" expr ")" | num
+// primary := "(" expr ")" | ident | num
 Node *primary(Token **rest, Token *tok) {
   if (equal(tok, "(")) {
     Node *node = expr(&tok, tok->next);
     *rest = skip(tok, ")");
+    return node;
+  }
+
+  if (tok->kind == TK_IDENT) {
+    Node *node = new_var_node(*tok->loc);
+    *rest = tok->next;
     return node;
   }
 
